@@ -11,21 +11,19 @@ pdfs.sort().forEach((pdf) => {
   pdfParser.loadPDF(pdf);
   pdfParser.on('pdfParser_dataError', errData => new Error(errData.parserError));
   pdfParser.on('pdfParser_dataReady', () => {
-    let data = pdfParser.getRawTextContent();
-    const score = calcTotal(data);
-    checkDone(pdf, score);
+    checkDone(pdfParser.getRawTextContent());
   });
 });
 
 const docs = glob.sync(`doc/*.doc`, {}).filter(v => !v.includes('/~$'));
 docs.sort().forEach((pdf) => {
   textract.fromFileWithPath(pdf, (err, data) => {
-    const score = calcTotal(data);
-    checkDone(pdf, score);
+    checkDone(data);
   });
 });
 
-function checkDone(pdf, score) {
+function checkDone(content) {
+  const {score} = calcTotal(content);
   map.set(pdf, score);
   if (map.size === docs.length + pdfs.length) {
     const tuple = Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
