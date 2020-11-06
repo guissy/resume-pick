@@ -1,12 +1,31 @@
-"use strict";
-exports.__esModule = true;
-var Calc;
-(function (Calc) {
-  Calc["sum"] = "sum";
-  Calc["max"] = "max";
-  Calc["avg"] = "avg";
-})(Calc = exports.Calc || (exports.Calc = {}));
-exports.db = [
+export enum Calc {
+  sum = 'sum', // 默认
+  max = 'max',
+  avg = 'avg',
+}
+interface TreeItem {
+  name: string;
+  children?: TreeItem[];
+}
+export interface KeywordItem extends TreeItem {
+  name: string;
+  score?: number;
+  alias?: string[];
+  calc?: Calc;
+  children?: KeywordItem[];
+  gained?: number; // 得分
+  months?: number; // 月
+  works?: WorkDate[]; // 工作经验时间段
+}
+
+export interface WorkDate {
+  startDate: Date;
+  endDate: Date;
+  workContent: string;
+  work?: string;
+}
+
+export const db = [
   {
     name: '核心项',
     score: 10,
@@ -27,7 +46,7 @@ exports.db = [
     ]
   },
   {
-    name: '函数式和语言',
+    name: '函数式和类js语言',
     children: [
       {name: 'typescript', alias: 'ts', score: 2},
       {name: 'rxjs', alias: ['ReactiveX', 'ngrx'], score: 2},
@@ -88,27 +107,28 @@ exports.db = [
   }
 ];
 // export const db;
-var Tree = /** @class */ (function () {
-  function Tree(items) {
-    this.items = items;
-    this.index = 0;
-    this.walked = [];
-    this.total = 0;
+
+// @ts-ignore
+export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
+  private index: number = 0;
+  public walked: T[] = [];
+
+  constructor(public items: TreeItem[]) {
     if (!Array.isArray(items)) {
-      this.items = [];
+      this.items = [] as TreeItem[];
     }
-    this.walk(this.items);
+    this.walk(this.items as T[]);
     // console.log('☞☞☞ 9527 keywords 97', this.walked);
   }
 
   // 对每段工作经验分析关键字
   // KeywordItem extends TreeItem
-  Tree.prototype.work = function (workDate) {
-    this.walked.forEach(function (keywordItem) {
+  work(workDate: WorkDate) {
+    this.walked.forEach((keywordItem: KeywordItem) => {
       if (!Array.isArray(keywordItem.alias)) {
         keywordItem.alias = [];
       }
-      var kws = keywordItem.alias.concat([keywordItem.name]).map(v => {
+      const kws = keywordItem.alias.concat([keywordItem.name]).map(v => {
         const hasAnyZh = /[^\x00-\xff]/.test(v);
         const isLongEn = v.length > 6;
         return hasAnyZh || isLongEn ? v : `\\b${v}\\b`;
@@ -120,63 +140,56 @@ var Tree = /** @class */ (function () {
         keywordItem.works.push(workDate);
       }
     });
-  };
-  // 计算总分, 公式为 score * months
-  Tree.prototype.calc = function (items) {
-    var _this = this;
-    if (items === void 0) {
-      items = this.items;
-    }
-    var totalGained = 0;
-    items.forEach(function (item) {
-      var notArray = !Array.isArray(item.children);
-      var emptyArray = Array.isArray(item.children) && item.children.length === 0;
+  }
+
+  // 计算总分
+  calc(items: KeywordItem[] = this.items): number {
+    let totalGained = 0;
+    items.forEach((item: KeywordItem) => {
+      const notArray = !Array.isArray(item.children);
+      const emptyArray = Array.isArray(item.children) && item.children.length === 0;
       if (notArray || emptyArray) {
-        var d = new Date(_this.calcMonth(item.works));
+        const d = new Date(this.calcMonth(item.works || []));
         item.months = (d.getFullYear() - 1970) * 12 + d.getMonth();
         // 仅将最末的元素的分值相加
-        item.gained = _this.calcScore(item.score, item.months);
+        item.gained = this.calcScore(item.score, item.months);
       } else {
-        item.gained = _this.calc(item.children) || 0;
+        item.gained = this.calc(item.children as T[]) || 0;
       }
       totalGained += item.gained;
     });
     return totalGained;
-  };
-  // 时间戳
-  Tree.prototype.calcMonth = function (works) {
-    var result = 0;
+  }
+
+  calcMonth(works: WorkDate[]) {
+    let result = 0;
     if (Array.isArray(works)) {
-      works.sort(function (_a, _b) {
-        var s1 = _a.startDate;
-        var s2 = _b.startDate;
-        return s1.getTime() - s2.getTime();
-      });
-      // console.log('\u2665 calcMonth 152', works);
-      result = works.reduce(function (_a, _b) {
-        var s1 = _a.startDate, e1 = _a.endDate, delay = _a.delay;
-        var s2 = _b.startDate, e2 = _b.endDate;
+      works.sort(({startDate: s1}, {startDate: s2}) => s1.getTime() - s2.getTime());
+      const { delay } = works.reduce(({startDate: s1, endDate: e1, delay}, {startDate: s2, endDate: e2}) => {
         // 1 包含 2
-        var startDate = new Date(0);
-        var endDate = new Date(0);
+        let startDate = new Date(0);
+        let endDate = new Date(0);
         if (e1 > e2) {
           startDate = s1;
           endDate = e1;
-          delay += 0;
-        } else if (s2 < e1) {
+          delay += endDate.getTime() - startDate.getTime();
+        } else if (s2 < e1 && e2 > e1) {
           startDate = s1;
           endDate = e2;
-          delay += e2.getTime() - e1.getTime();
-        } else if (s2 >= e1) {
+          delay += endDate.getTime() - startDate.getTime();
+        } else if (s2 > e1) {
           startDate = s2;
           endDate = e2;
+          delay += e1.getTime() - s1.getTime();
           delay += e2.getTime() - s2.getTime();
         }
-        return {startDate: startDate, endDate: endDate, delay: delay};
-      }, {startDate: new Date(0), endDate: new Date(0), delay: 0}).delay;
+        return { startDate, endDate, delay };
+      }, { startDate: new Date(0), endDate: new Date(0), delay: 0 })
+      result = delay;
     }
     return result;
-  };
+  }
+
   // 6个月拿到1倍的 score
   // 12个月拿到2倍的 score
   // 18个月拿到3倍的 score
@@ -187,8 +200,8 @@ var Tree = /** @class */ (function () {
    * @param {number} months 多少月
    * @returns {number}
    */
-  Tree.prototype.calcScore = function (score, months) {
-    var monthsValid = 0;
+  calcScore(score: number, months: number) {
+    let monthsValid = 0;
     if (months > 0) {
       if (score <= 0.5) {
         monthsValid = Math.min(months, 6);
@@ -203,44 +216,41 @@ var Tree = /** @class */ (function () {
       }
     }
     return score * monthsValid / 6;
-  };
-  Tree.prototype.walk = function (items) {
-    var _this = this;
-    items.forEach(function (item) {
-      var notArray = !Array.isArray(item.children);
-      var emptyArray = Array.isArray(item.children) && item.children.length === 0;
+  }
+
+  walk(items: T[]) {
+    items.forEach((item: T) => {
+      const notArray = !Array.isArray(item.children);
+      const emptyArray = Array.isArray(item.children) && item.children.length === 0;
       if (notArray || emptyArray) {
         // 仅将最末的元素添加到数组中，扔掉中间元素
-        _this.walked.push(item);
+        this.walked.push(item);
       } else {
-        _this.walk(item.children);
+        this.walk(item.children as T[]);
       }
-    });
-  };
-  Tree.prototype.next = function () {
+    })
+  }
+
+  next(value?: T): IteratorResult<T> {
     // 忽略 level 1, 遍历 level 2 和 level 3
     // 分别使用 Lv1 Lv2 Lv3 表示各级别
-    var item;
-    var isLastOne = this.index === this.walked.length;
+    let item: T;
+    const isLastOne = this.index == this.walked.length;
     item = this.walked[this.index];
     // console.log('\u2665 next', this.index);
     this.index += 1;
-    return {value: item, done: isLastOne};
-  };
-  Tree.prototype["throw"] = function () {
-    return {value: null, done: true};
-  };
-  Object.defineProperty(Tree.prototype, "length", {
-    get: function () {
-      return this.walked.length;
-    },
-    enumerable: true,
-    configurable: true
-  });
-  Tree.prototype[Symbol.iterator] = function () {
+    return { value: item, done: isLastOne };
+  }
+
+  throw(e?: Error): IteratorResult<T> {
+    return { value: null, done: true };
+  }
+
+  get length(): number {
+    return this.walked.length;
+  }
+
+  [Symbol.iterator](): IterableIterator<T> {
     return this;
-  };
-  return Tree;
-}());
-exports.Tree = Tree;
-exports["default"] = Tree;
+  }
+}
