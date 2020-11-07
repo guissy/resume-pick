@@ -6,25 +6,25 @@ const chalk = require('chalk');
 
 const map = new Map();
 const pdfs = glob.sync(`doc/*.pdf`, {});
-pdfs.sort().forEach((pdf) => {
+pdfs.sort().forEach((file) => {
   const pdfParser = new PDFParser(this, 1);
-  pdfParser.loadPDF(pdf);
+  pdfParser.loadPDF(file);
   pdfParser.on('pdfParser_dataError', errData => new Error(errData.parserError));
   pdfParser.on('pdfParser_dataReady', () => {
-    checkDone(pdfParser.getRawTextContent());
+    checkDone(file, pdfParser.getRawTextContent());
   });
 });
 
 const docs = glob.sync(`doc/*.doc`, {}).filter(v => !v.includes('/~$'));
-docs.sort().forEach((pdf) => {
-  textract.fromFileWithPath(pdf, (err, data) => {
-    checkDone(data);
+docs.sort().forEach((file) => {
+  textract.fromFileWithPath(file, (err, data) => {
+    checkDone(file, data);
   });
 });
 
-function checkDone(content) {
+function checkDone(file, content) {
   const {score} = calcTotal(content);
-  map.set(pdf, score);
+  map.set(file, score);
   if (map.size === docs.length + pdfs.length) {
     const tuple = Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
     const mapOk = new Map(tuple);
