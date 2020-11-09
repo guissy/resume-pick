@@ -41,6 +41,7 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
   // 对每段工作经验分析关键字
   // KeywordItem extends TreeItem
   work(workDate: WorkDate) {
+    const texts = workDate.workContent.split(/[\n；;。]/).filter(Boolean);
     this.walked.forEach((keywordItem: KeywordItem) => {
       if (!Array.isArray(keywordItem.alias)) {
         keywordItem.alias = [];
@@ -54,7 +55,13 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
         }
         return `\\b${v}\\b`;
       }).join('|');
-      if (workDate.workContent.match(new RegExp(kws, 'gi'))) {
+      let hasFound = false;
+      texts.forEach((content) => {
+        if (!content.includes('了解') && content.match(new RegExp(kws, 'gi'))) {
+          hasFound = true;
+        }
+      });
+      if (hasFound) {
         if (!Array.isArray(keywordItem.works)) {
           keywordItem.works = [];
         }
@@ -98,11 +105,14 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
           startDate = s1;
           endDate = e2;
           delay += endDate.getTime() - startDate.getTime();
-        } else if (s2 > e1) {
+        } else if (s2 > e1 && e1.getTime() > 0) {
           startDate = s2;
           endDate = e2;
-          delay += e1.getTime() - s1.getTime();
-          delay += e2.getTime() - s2.getTime();
+          delay += endDate.getTime() - startDate.getTime();
+        } else if (s1.getTime() === 0 && e1.getTime() === 0) {
+          startDate = s2;
+          endDate = e2;
+          delay += endDate.getTime() - startDate.getTime();
         }
         return { startDate, endDate, delay };
       }, { startDate: new Date(0), endDate: new Date(0), delay: 0 })
@@ -122,21 +132,29 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
    * @returns {number}
    */
   calcScore(score: number, months: number) {
+    if (months < 1) return 0
     let monthsValid = 0;
+    let rate = 1;
     if (months > 0) {
       if (score <= 0.5) {
         monthsValid = Math.min(months, 6);
+        rate = 8;
       } else if (score <= 1) {
         monthsValid = Math.min(months, 10);
+        rate = 4.8;
       } else if (score <= 2) {
         monthsValid = Math.min(months, 12);
+        rate = 4
       } else if (score <= 3) {
         monthsValid = Math.min(months, 15);
+        rate = 3.2
       } else {
         monthsValid = Math.min(months, 18);
+        rate = 2.6
       }
     }
-    return score * monthsValid / 6;
+    // return score * monthsValid / 6;
+    return score * Math.log2(months) / rate;
   }
 
   walk(items: T[]) {
