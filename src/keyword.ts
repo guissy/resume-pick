@@ -48,7 +48,7 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
       const kws = keywordItem.alias.concat([keywordItem.name]).map(v => {
         const hasAnyZh = /[^\x00-\xff]/.test(v);
         const isLongEn = v.length > 6;
-        return hasAnyZh || isLongEn ? v : `\\b${v}\\b`;
+        return (hasAnyZh || isLongEn) ? v : `\\b${v}\\b`;
       }).join('|');
       if (workDate.workContent.match(new RegExp(kws, 'gi'))) {
         if (!Array.isArray(keywordItem.works)) {
@@ -154,7 +154,6 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
     let item: T;
     const isLastOne = this.index == this.walked.length;
     item = this.walked[this.index];
-    // console.log('\u2665 next', this.index);
     this.index += 1;
     return { value: item, done: isLastOne };
   }
