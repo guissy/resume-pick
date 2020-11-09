@@ -48,7 +48,11 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
       const kws = keywordItem.alias.concat([keywordItem.name]).map(v => {
         const hasAnyZh = /[^\x00-\xff]/.test(v);
         const isLongEn = v.length > 6;
-        return (hasAnyZh || isLongEn) ? v : `\\b${v}\\b`;
+        if (hasAnyZh || isLongEn) return v;
+        if (['java', 'go', 'rust', 'php', 'python'].includes(v)) {
+          return `\\b${v}\\b(?!\\s*[接口])`;
+        }
+        return `\\b${v}\\b`;
       }).join('|');
       if (workDate.workContent.match(new RegExp(kws, 'gi'))) {
         if (!Array.isArray(keywordItem.works)) {
