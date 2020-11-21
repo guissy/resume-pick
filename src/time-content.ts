@@ -7,10 +7,10 @@ export function findSchool(text: string) {
   // eslint-disable-next-line no-control-regex
   const regExp1 = /([^\x00-\xff]){2,6}(学院|大学|职院|师范|职中|高中|中学|一中)/;
   const regExp2 = /(计机|计算机|电脑|电子)/;
-  return regExp1.test(text) || regExp2.test(text);
+  return text.length < 32 && (regExp1.test(text) || regExp2.test(text));
 }
 
-function calcWorkDate(start, end) {
+function calcWorkDate(start: string, end: string) {
   let startDate = new Date(start);
   let endDate = end === '至今' ? new Date() : new Date(end);
   endDate.setDate(30);
@@ -21,24 +21,24 @@ function calcWorkDate(start, end) {
   };
 }
 
-function calcTotal(content, config = defaultConfig) {
+export function calcTotal(content: string, config = defaultConfig) {
   const month = /(20(09|10|11|12|13|14|15|16|17|18|19|20|21|22)([.\-\/年])\d{1,2})月?\s*([—–\-~至])+\s*(20(09|10|11|12|13|14|15|16|17|18|19|20|21|22)([.\-\/年])\d{1,2}月?|至今)/
   let n = 0;
-  const nodes = [];
+  const nodes = [] as [number, string, string][];
   const d = new Date();
   d.setMonth(d.getMonth() - 3);
   let max = d;
   while (n < content.length) {
-    const match = content.slice(n).match(month);
-    if (match && match.index >= 0) {
+    const match = content.slice(n).match(month) as RegExpMatchArray;
+    if (match && Number(match.index) >= 0) {
       const start = match[1].replace(/[年月]/g, '-');
       const end = match[5].replace(/[年月]/g, '-');
-      nodes.push([n + match.index + match[0].length, start, end]);
-      if (match[1] > max) {
-        max = match[1];
-      }
+      nodes.push([n + Number(match.index) + match[0].length, start, end]);
+      // if (match[1] > max) {
+      //   max = match[1];
+      // }
     }
-    n += match && match.index + 14 || 14;
+    n += match && Number(match.index) + 14 || 14;
   }
   const keywords = new Tree(cloneDeep(config));
   let schoolInfo = '';
@@ -52,8 +52,8 @@ function calcTotal(content, config = defaultConfig) {
     }
   });
   if (nodes.length > 0) {
-    const date = calcWorkDate(max, new Date());
-    const baseInfo = content.slice(0, nodes[0][0]);
+    const date = calcWorkDate(max.toDateString(), new Date().toDateString());
+    const baseInfo = content.slice(0, Number(nodes[0][0]));
     date.workContent = baseInfo + schoolInfo;
     keywords.work(date);
   }

@@ -3,7 +3,7 @@ export enum Calc {
   max = 'max',
   avg = 'avg',
 }
-interface TreeItem {
+export interface TreeItem {
   name: string;
   children?: TreeItem[];
 }
@@ -80,7 +80,7 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
         const d = new Date(this.calcMonth(item.works || []));
         item.months = (d.getFullYear() - 1970) * 12 + d.getMonth();
         // 仅将最末的元素的分值相加
-        item.gained = this.calcScore(item.score, item.months);
+        item.gained = this.calcScore(item.score || 0, item.months);
       } else {
         item.gained = this.calc(item.children as T[]) || 0;
       }
@@ -97,14 +97,14 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
         // 1 包含 2
         let startDate = new Date(0);
         let endDate = new Date(0);
-        if (e1 > e2) {
+        if (e1 >= e2) {
           startDate = s1;
           endDate = e1;
-          delay += endDate.getTime() - startDate.getTime();
+          delay += 0;
         } else if (s2 < e1 && e2 > e1) {
           startDate = s1;
           endDate = e2;
-          delay += endDate.getTime() - startDate.getTime();
+          delay += e2.getTime() - e1.getTime();
         } else if (s2 > e1 && e1.getTime() > 0) {
           startDate = s2;
           endDate = e2;
@@ -133,23 +133,17 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
    */
   calcScore(score: number, months: number) {
     if (months < 1) return 0
-    let monthsValid = 0;
     let rate = 1;
     if (months > 0) {
       if (score <= 0.5) {
-        monthsValid = Math.min(months, 6);
         rate = 8;
       } else if (score <= 1) {
-        monthsValid = Math.min(months, 10);
         rate = 4.8;
       } else if (score <= 2) {
-        monthsValid = Math.min(months, 12);
         rate = 4
       } else if (score <= 3) {
-        monthsValid = Math.min(months, 15);
         rate = 3.2
       } else {
-        monthsValid = Math.min(months, 18);
         rate = 2.6
       }
     }
@@ -170,7 +164,7 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
     })
   }
 
-  next(value?: T): IteratorResult<T> {
+  next(): IteratorResult<T> {
     // 忽略 level 1, 遍历 level 2 和 level 3
     // 分别使用 Lv1 Lv2 Lv3 表示各级别
     let item: T;
@@ -180,6 +174,7 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
     return { value: item, done: isLastOne };
   }
 
+  // @ts-ignore
   throw(e?: Error): IteratorResult<T> {
     return { value: null, done: true };
   }
