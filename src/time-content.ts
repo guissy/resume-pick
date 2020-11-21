@@ -5,7 +5,7 @@ const cloneDeep = require('lodash/cloneDeep')
 
 export function findSchool(text: string) {
   // eslint-disable-next-line no-control-regex
-  const regExp = /([^\x00-\xff])({2, 6}(学院|大学|职院|师范|职中|高中|中学|一中)/;
+  const regExp = /([^\x00-\xff]){2,6}(学院|大学|职院|师范|职中|高中|中学|一中)/;
   return (text || '').match(regExp)?.[0] || '';
 }
 
