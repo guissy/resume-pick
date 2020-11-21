@@ -1,7 +1,13 @@
 import { config as defaultConfig } from './config';
 
-const {Tree, db} = require('./keyword');
+const {Tree} = require('./keyword');
 const cloneDeep = require('lodash/cloneDeep')
+
+export function findSchool(text: string) {
+  // eslint-disable-next-line no-control-regex
+  const regExp = /[^\x00-\xff]{2, 6}(学院|大学|职院|师范|职中|高中|中学|一中)/;
+  return (text || '').match(regExp)?.[0] || '';
+}
 
 function calcWorkDate(start, end) {
   let startDate = new Date(start);
@@ -37,7 +43,9 @@ function calcTotal(content, config = defaultConfig) {
   if (nodes.length > 0) {
     const date = calcWorkDate(max, new Date());
     date.workContent = content.slice(0, nodes[0][0]);
-    keywords.work(date);
+    if (!findSchool(date.workContent)) {
+      keywords.work(date);
+    }
   }
   nodes.forEach(([n, start, end], i, arr) => {
     const date = calcWorkDate(start, end);
