@@ -1,6 +1,6 @@
 import { config as defaultConfig } from './config';
 
-const {Tree} = require('./keyword');
+const { Tree } = require('./keyword');
 const cloneDeep = require('lodash/cloneDeep')
 
 export function findSchool(text: string) {
@@ -43,17 +43,17 @@ function calcTotal(content, config = defaultConfig) {
   if (nodes.length > 0) {
     const date = calcWorkDate(max, new Date());
     date.workContent = content.slice(0, nodes[0][0]);
-    if (!findSchool(date.workContent)) {
-      keywords.work(date);
-    }
+    keywords.work(date);
   }
   nodes.forEach(([n, start, end], i, arr) => {
     const date = calcWorkDate(start, end);
     date.workContent = content.slice(n, arr[i + 1] && arr[i + 1][0]);
-    keywords.work(date);
+    if (!findSchool(date.workContent)) {
+      keywords.work(date);
+    }
   });
   const score = keywords.calc(keywords.items);
-  return {score, keywords};
+  return { score, keywords };
 }
 
 exports.calcTotal = calcTotal;
