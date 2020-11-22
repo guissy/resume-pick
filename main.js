@@ -63,9 +63,9 @@ function checkDone(file, content) {
       i += 1;
       const fileName = filePath.split('/').pop().split('.').shift();
       if (result.level) {
-        const level = result.level.padEnd(4, ' ');
-        const score = result.score.toFixed(1).padStart(5, ' ');
-        const workAge = (Math.round(result.workAge * 2) / 2).toFixed(1).padStart(5, ' ');
+        const level = 'level: ' + result.level.padEnd(4, ' ');
+        const score = 'score: ' + result.score.toFixed(1).padStart(4, ' ');
+        const workAge = ' years:' + (Math.round(result.workAge * 2) / 2).toFixed(1).padStart(4, ' ');
         const ii = mapOk.size > 1 ? i.toString().padStart(2, '0') : '';
         let ss = '';
         if (result.levelValue >= 8) {
