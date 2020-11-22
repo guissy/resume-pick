@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const PDFParser = require('pdf2json');
 const textract = require('textract');
 const glob = require('glob');
