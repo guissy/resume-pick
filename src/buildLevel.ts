@@ -6,31 +6,37 @@ export default function buildLevel(
   text: string
 ) {
   let lv = '...';
-  const ageLv = workAge > 2 ? Math.log2(workAge * 12) / 2 : 0; // +0.75-0.75
-  const scoreLv = (score + 3) / 5; // +0.75-0.75
+  const ageLv = (workAge + 0.455) ** 0.88; // 0.5+
+  const scoreLv = (score + 3) / 6; // 0.5+
   const total = ageLv + scoreLv;
-  if (total >= 9) {
+  if (total > 13) {
+    lv = 'p8++';
+  } else if (total > 12) {
+    lv = 'p8+';
+  } else if (total > 11) {
+    lv = 'p8';
+  } else if (total > 10) {
+    lv = 'p7++';
+  } else if (total > 9) {
     lv = 'p7+';
   } else if (total > 8) {
     lv = 'p7';
   } else if (total > 7) {
-    lv = 'p6+';
+    lv = 'p6++';
   } else if (total > 6) {
-    lv = 'p6';
+    lv = 'p6+';
   } else if (total > 5) {
-    lv = 'p5+';
+    lv = 'p6';
   } else if (total > 4) {
-    lv = 'p5';
+    lv = 'p5+';
   } else if (total > 3) {
-    lv = 'p4';
+    lv = 'p5';
   } else if (total > 2) {
-    lv = 'p3';
+    lv = 'p4+';
   } else if (total > 1) {
-    lv = 'p2';
-  } else if (total > 0) {
-    lv = 'p1';
+    lv = 'p4';
   } else if (text.length > 0) {
-    lv = '-';
+    lv = '--';
   }
   return { level: lv, levelValue: total };
 }

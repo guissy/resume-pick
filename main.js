@@ -17,9 +17,12 @@ function batchScore(pathname = 'doc') {
     return;
   }
   const isDir = fs.lstatSync(pathname).isDirectory();
+  const isWeb = pathname.startsWith('http');
   if (isDir) {
     pdfs = glob.sync(`${pathname}/*.pdf`, {});
     docs = glob.sync(`${pathname}/*.doc`, {}).filter(v => !v.includes('/~$'));
+  } else if (isWeb) {
+
   } else {
     if (pathname.endsWith('pdf')) {
       pdfs = [pathname];
@@ -68,18 +71,15 @@ function checkDone(file, content) {
         const workAge = ' years:' + (Math.round(result.workAge * 2) / 2).toFixed(1).padStart(4, ' ');
         const ii = mapOk.size > 1 ? i.toString().padStart(2, '0') : '';
         let ss = '';
-        if (result.levelValue >= 8) {
+        if (result.levelValue > 8) {
           ss = `🐮`.repeat(3);
           console.log(chalk.red(`${ii} ${ss} ${level} ${score} ${workAge} ${fileName}`));
-        } else if (result.levelValue >= 6) {
-          ss = `🦞`.repeat(3);
+        } else if (result.levelValue > 5) {
+          ss = `🐴`.repeat(3);
           console.log(chalk.yellow(`${ii} ${ss} ${level} ${score} ${workAge} ${fileName}`));
-        } else if (result.levelValue >= 4) {
+        } else if (result.levelValue > 3) {
           ss = `🦧`.repeat(3);
           console.log(chalk.blue(`${ii} ${ss} ${level} ${score} ${workAge} ${fileName}`));
-        } else if (result.levelValue >= 2) {
-          ss = `🥦`.repeat(3);
-          console.log(chalk.green(`${ii} ${ss} ${level} ${score} ${workAge} ${fileName}`));
         } else {
           ss = `🥬`.repeat(3);
           console.log(chalk.gray(`${ii} ${ss} ${level} ${score} ${workAge} ${fileName}`));
