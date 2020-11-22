@@ -1,4 +1,5 @@
-import { config as defaultConfig } from './config';
+import configDefault from './config';
+import buildLevel, { trackWorkYear } from '../lib/buildLevel';
 
 const { Tree } = require('./keyword');
 const cloneDeep = require('lodash/cloneDeep')
@@ -7,7 +8,7 @@ export function findSchool(text: string) {
   // eslint-disable-next-line no-control-regex
   const regExp1 = /([^\x00-\xff]){2,6}(学院|大学|职院|师范|职中|高中|中学|一中)/;
   const regExp2 = /(计机|计算机|电脑|电子)/;
-  return text.length < 32 && (regExp1.test(text) || regExp2.test(text));
+  return (regExp1.test(text.slice(0, 33)) || regExp2.test(text.slice(0, 33)));
 }
 
 function calcWorkDate(start: string, end: string) {
@@ -21,7 +22,7 @@ function calcWorkDate(start: string, end: string) {
   };
 }
 
-export function calcTotal(content: string, config = defaultConfig) {
+export function calcTotal(content: string, config = configDefault) {
   const month = /(20(09|10|11|12|13|14|15|16|17|18|19|20|21|22)([.\-\/年])\d{1,2})月?\s*([—–\-~至])+\s*(20(09|10|11|12|13|14|15|16|17|18|19|20|21|22)([.\-\/年])\d{1,2}月?|至今)/
   let n = 0;
   const nodes = [] as [number, string, string][];
@@ -58,7 +59,9 @@ export function calcTotal(content: string, config = defaultConfig) {
     keywords.work(date);
   }
   const score = keywords.calc(keywords.items);
-  return { score, keywords };
+  const workAge = trackWorkYear(keywords);
+  const { level, levelValue } = buildLevel(workAge, score, content);
+  return { score, workAge, level, levelValue, keywords };
 }
 
 exports.calcTotal = calcTotal;
