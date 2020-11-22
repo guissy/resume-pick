@@ -29,18 +29,26 @@ function batchScore(pathname = 'doc') {
   }
 
   pdfs.sort().forEach((file) => {
-    const pdfParser = new PDFParser(this, 1);
-    pdfParser.loadPDF(file);
-    pdfParser.on('pdfParser_dataError', errData => new Error(errData.parserError));
-    pdfParser.on('pdfParser_dataReady', () => {
-      checkDone(file, pdfParser.getRawTextContent());
-    });
+    if (fs.lstatSync(file).size / 1e06 < 2) {
+      const pdfParser = new PDFParser(this, 1);
+      pdfParser.loadPDF(file);
+      pdfParser.on('pdfParser_dataError', errData => new Error(errData.parserError));
+      pdfParser.on('pdfParser_dataReady', () => {
+        checkDone(file, pdfParser.getRawTextContent());
+      });
+    } else {
+      resultMap.set(file, { score: 0, level: '', levelValue: 0 });
+    }
   });
 
   docs.sort().forEach((file) => {
-    textract.fromFileWithPath(file, (err, data) => {
-      checkDone(file, data);
-    });
+    if (fs.lstatSync(file).size / 1e06 < 2) {
+      textract.fromFileWithPath(file, (err, data) => {
+        checkDone(file, data);
+      });
+    } else {
+      resultMap.set(file, { score: 0, level: '', levelValue: 0 });
+    }
   });
 }
 
@@ -54,26 +62,28 @@ function checkDone(file, content) {
     mapOk.forEach((result, filePath) => {
       i += 1;
       const fileName = filePath.split('/').pop().split('.').shift();
-      const level = result.level.padEnd(4, ' ');
-      const score = result.score.toFixed(1).padStart(5, ' ');
-      const workAge = (Math.round(result.workAge * 2) / 2).toFixed(1).padStart(5, ' ');
-      const ii = mapOk.size > 1 ? i.toString().padStart(2, '0') : '';
-      let ss = '';
-      if (result.levelValue >= 8) {
-        ss = `🐮`.repeat(3);
-        console.log(chalk.red(`${ii} ${ss} ${level} ${score} ${workAge} ${fileName}`));
-      } else if (result.levelValue >= 6) {
-        ss = `🦞`.repeat(3);
-        console.log(chalk.yellow(`${ii} ${ss} ${level} ${score} ${workAge} ${fileName}`));
-      } else if (result.levelValue >= 4) {
-        ss = `🦧`.repeat(3);
-        console.log(chalk.blue(`${ii} ${ss} ${level} ${score} ${workAge} ${fileName}`));
-      } else if (result.levelValue >= 2) {
-        ss = `🥦`.repeat(3);
-        console.log(chalk.green(`${ii} ${ss} ${level} ${score} ${workAge} ${fileName}`));
-      } else {
-        ss = `🥬`.repeat(3);
-        console.log(chalk.gray(`${ii} ${ss} ${level} ${score} ${workAge} ${fileName}`));
+      if (result.level) {
+        const level = result.level.padEnd(4, ' ');
+        const score = result.score.toFixed(1).padStart(5, ' ');
+        const workAge = (Math.round(result.workAge * 2) / 2).toFixed(1).padStart(5, ' ');
+        const ii = mapOk.size > 1 ? i.toString().padStart(2, '0') : '';
+        let ss = '';
+        if (result.levelValue >= 8) {
+          ss = `🐮`.repeat(3);
+          console.log(chalk.red(`${ii} ${ss} ${level} ${score} ${workAge} ${fileName}`));
+        } else if (result.levelValue >= 6) {
+          ss = `🦞`.repeat(3);
+          console.log(chalk.yellow(`${ii} ${ss} ${level} ${score} ${workAge} ${fileName}`));
+        } else if (result.levelValue >= 4) {
+          ss = `🦧`.repeat(3);
+          console.log(chalk.blue(`${ii} ${ss} ${level} ${score} ${workAge} ${fileName}`));
+        } else if (result.levelValue >= 2) {
+          ss = `🥦`.repeat(3);
+          console.log(chalk.green(`${ii} ${ss} ${level} ${score} ${workAge} ${fileName}`));
+        } else {
+          ss = `🥬`.repeat(3);
+          console.log(chalk.gray(`${ii} ${ss} ${level} ${score} ${workAge} ${fileName}`));
+        }
       }
     });
   }

@@ -1,4 +1,4 @@
-import { Tree, TreeItem } from '../src/keyword';
+import { Tree, TreeItem } from './keyword';
 
 export default function buildLevel(
   workAge: number,

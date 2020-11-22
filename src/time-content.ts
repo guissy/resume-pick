@@ -1,5 +1,5 @@
 import configDefault from './config';
-import buildLevel, { trackWorkYear } from '../lib/buildLevel';
+import buildLevel, { trackWorkYear } from './buildLevel';
 
 const { Tree } = require('./keyword');
 const cloneDeep = require('lodash/cloneDeep')
@@ -63,5 +63,3 @@ export function calcTotal(content: string, config = configDefault) {
   const { level, levelValue } = buildLevel(workAge, score, content);
   return { score, workAge, level, levelValue, keywords };
 }
-
-exports.calcTotal = calcTotal;

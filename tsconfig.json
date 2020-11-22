@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES2018",
+    "target": "es6",
     "module": "CommonJS",
-    "lib": ["dom", "esnext"],
+    "lib": ["esnext.array", "esnext"],
     "declaration": true,
     "declarationMap": true,
     "noEmit": true,
