@@ -43,3 +43,31 @@ test('calcTotal', () => {
   expect(m / msInYear).toBeGreaterThan(1)
 });
 
+test('work', () => {
+  const tree = new Tree([
+    {
+      name: 't',
+      children: [{
+        "name": "大厂背景",
+        "alias": [
+          "\\b阿里巴巴",
+          "\\b腾讯",
+          "\\b百度",
+          "\\b京东",
+          "\\b美团",
+          "\\b新浪",
+          "\\b网易",
+          "\\b字节跳动"
+        ],
+        "score": 2.5
+      }]
+    }
+  ]);
+  tree.work({
+    startDate: new Date(2019, 1, 1),
+    endDate: new Date(2020, 1, 1),
+    workContent: ` 美团点评 职位：WEB前端 参与日均`
+  });
+  expect(tree.items[0].children?.[0].score).toBeGreaterThan(2)
+});
+

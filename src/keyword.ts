@@ -5,7 +5,7 @@ export enum Calc {
 }
 export interface TreeItem {
   name: string;
-  children?: TreeItem[];
+  children?: KeywordItem[];
 }
 export interface KeywordItem extends TreeItem {
   name: string;
@@ -46,9 +46,17 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
       if (!Array.isArray(keywordItem.alias)) {
         keywordItem.alias = [];
       }
-      const kws = keywordItem.alias.concat([keywordItem.name]).map(v => {
+      let hasZhB = false;
+      const names = keywordItem.alias.concat([keywordItem.name]);
+      const kws = names.map(v => {
         const hasAnyZh = /[^\x00-\xff]/.test(v);
         const isLongEn = v.length > 6;
+        const hasB = v.startsWith(`\\b`);
+        if (hasAnyZh && hasB) {
+          const s = v.slice(2) + '(?!(小程序|地图|API|云|开放平台|平台|官方|开源|团队))';
+          hasZhB = true;
+          return `((\t|\s|　)${s})`;
+        }
         if (hasAnyZh || isLongEn) return v;
         if (['java', 'go', 'rust', 'php', 'python'].includes(v)) {
           return `\\b${v}\\b(?!\\s*[接口])`;
@@ -57,8 +65,12 @@ export class Tree<T extends TreeItem> implements IterableIterator<TreeItem> {
       }).join('|');
       let hasFound = false;
       texts.forEach((content) => {
-        if (!content.includes('了解') && content.match(new RegExp(kws, 'gi'))) {
-          hasFound = true;
+        if (!content.includes('了解')) {
+          const found1 = !!content.match(new RegExp(kws, 'gi'));
+          const found2 = hasZhB && names.some(n => content.startsWith(n.slice(2)));
+          if (!hasFound) {
+            hasFound = found1 || found2;
+          }
         }
       });
       if (hasFound) {
