@@ -1,6 +1,6 @@
 {
   "name": "resume-pick",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "",
   "main": "main.js",
   "bin": "main.js",
@@ -8,7 +8,7 @@
     "node": ">=11.0.0"
   },
   "scripts": {
-    "build": "tsc src/* --outDir lib -t ES2019 --skipLibCheck"
+    "build": "tsc src/* --outDir lib -t ES5 --lib es2019 --skipLibCheck"
   },
   "keywords": [],
   "author": "guissy <guissy@qq.com>",
