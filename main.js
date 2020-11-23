@@ -71,25 +71,29 @@ function checkDone(file, content) {
         const workAge = ' years:' + (Math.round(result.workAge * 2) / 2).toFixed(1).padStart(4, ' ');
         const ii = mapOk.size > 1 ? i.toString().padStart(2, '0') : '';
         let ss = '';
-        const tech = result.keywords.items
+        let tech = result.keywords.items
           .map((k) => (k.children
               .filter((w) => w.gained >= 0.5)
-              .map((w) => w.name)
+              .map((w) => w.name.replace(' ', '_'))
               .join('/')
           ))
           .filter(v => v.length)
           .join('/');
+        if (tech.length > 50) tech = tech.slice(0, 47) + '...';
+        if (mapOk.size > 1) {
+          tech = '';
+        }
         if (result.levelValue > 8) {
-          ss = `🐮`.repeat(3);
+          ss = `🐮`;
           console.log(chalk.red(`${ii} ${ss} ${level} ${score} ${workAge} ${tech} ${fileName}`));
         } else if (result.levelValue > 5) {
-          ss = `🐴`.repeat(3);
+          ss = `🐴`;
           console.log(chalk.yellow(`${ii} ${ss} ${level} ${score} ${workAge} ${tech} ${fileName}`));
         } else if (result.levelValue > 3) {
-          ss = `🦧`.repeat(3);
+          ss = `🦧`;
           console.log(chalk.blue(`${ii} ${ss} ${level} ${score} ${workAge} ${tech} ${fileName}`));
         } else {
-          ss = `🥬`.repeat(3);
+          ss = `🥬`;
           console.log(chalk.gray(`${ii} ${ss} ${level} ${score} ${workAge} ${tech} ${fileName}`));
         }
       }
