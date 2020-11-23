@@ -6,8 +6,8 @@ export default function buildLevel(
   text: string
 ) {
   let lv = '...';
-  const ageLv = (workAge + 0.455) ** 0.88; // 0.5+
-  const scoreLv = (score + 3) / 6; // 0.5+
+  const ageLv = Math.log2((workAge + 2) ** 1.5); // 0.492+
+  const scoreLv = ((score + 2.2) ** 0.95) / 5.2; // 0.407+
   const total = ageLv + scoreLv;
   if (total > 13) {
     lv = 'p8++';
@@ -45,7 +45,7 @@ export function trackWorkYear(kw: Tree<TreeItem>) {
   const msInYear = 31536000000;
   return (
     kw.calcMonth(
-      kw.items.map((k) => (k.children || []).map((w) => w.works || [])).flat(2)
+      kw.items.map((k) => (k.children || []).map((w) => Number(w.score) > 0 && w.works ? w.works : [])).flat(2)
     ) / msInYear
   );
 }
