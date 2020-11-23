@@ -40,7 +40,7 @@ function batchScore(pathname = 'doc') {
         checkDone(file, pdfParser.getRawTextContent());
       });
     } else {
-      resultMap.set(file, { score: 0, level: '', levelValue: 0 });
+      resultMap.set(file, {score: 0, level: '', levelValue: 0});
     }
   });
 
@@ -50,7 +50,7 @@ function batchScore(pathname = 'doc') {
         checkDone(file, data);
       });
     } else {
-      resultMap.set(file, { score: 0, level: '', levelValue: 0 });
+      resultMap.set(file, {score: 0, level: '', levelValue: 0});
     }
   });
 }
@@ -71,18 +71,26 @@ function checkDone(file, content) {
         const workAge = ' years:' + (Math.round(result.workAge * 2) / 2).toFixed(1).padStart(4, ' ');
         const ii = mapOk.size > 1 ? i.toString().padStart(2, '0') : '';
         let ss = '';
+        const tech = result.keywords.items
+          .map((k) => (k.children
+              .filter((w) => w.gained >= 0.5)
+              .map((w) => w.name)
+              .join('/')
+          ))
+          .filter(v => v.length)
+          .join('/');
         if (result.levelValue > 8) {
           ss = `🐮`.repeat(3);
-          console.log(chalk.red(`${ii} ${ss} ${level} ${score} ${workAge} ${fileName}`));
+          console.log(chalk.red(`${ii} ${ss} ${level} ${score} ${workAge} ${tech} ${fileName}`));
         } else if (result.levelValue > 5) {
           ss = `🐴`.repeat(3);
-          console.log(chalk.yellow(`${ii} ${ss} ${level} ${score} ${workAge} ${fileName}`));
+          console.log(chalk.yellow(`${ii} ${ss} ${level} ${score} ${workAge} ${tech} ${fileName}`));
         } else if (result.levelValue > 3) {
           ss = `🦧`.repeat(3);
-          console.log(chalk.blue(`${ii} ${ss} ${level} ${score} ${workAge} ${fileName}`));
+          console.log(chalk.blue(`${ii} ${ss} ${level} ${score} ${workAge} ${tech} ${fileName}`));
         } else {
           ss = `🥬`.repeat(3);
-          console.log(chalk.gray(`${ii} ${ss} ${level} ${score} ${workAge} ${fileName}`));
+          console.log(chalk.gray(`${ii} ${ss} ${level} ${score} ${workAge} ${tech} ${fileName}`));
         }
       }
     });

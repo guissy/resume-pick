@@ -11,6 +11,22 @@ export function findSchool(text: string) {
   return (regExp1.test(text.slice(0, 33)) || regExp2.test(text.slice(0, 33)));
 }
 
+export function findBasic(text: string) {
+  const regExp = /(自我描述|专业技能)/;
+  const found = text.match(regExp);
+  if (Number(found?.index) > 0) {
+    return {
+      workContent: text.slice(0, found?.index),
+      basic: text.slice(found?.index)
+    }
+  } else {
+    return {
+      workContent: text,
+      basic: '',
+    }
+  }
+}
+
 function calcWorkDate(start: string, end: string) {
   let startDate = new Date(start);
   let endDate = end === '至今' ? new Date() : new Date(end);
@@ -43,19 +59,25 @@ export function calcTotal(content: string, config = configDefault) {
   }
   const keywords = new Tree(cloneDeep(config));
   let schoolInfo = '';
+  let basicInfo = '';
   nodes.forEach(([n, start, end], i, arr) => {
     const date = calcWorkDate(start, end);
     date.workContent = content.slice(n, arr[i + 1] && arr[i + 1][0]);
     if (!findSchool(date.workContent)) {
+      const { workContent, basic } = findBasic(date.workContent);
+      date.workContent = workContent;
+      if (basic) {
+        basicInfo = basic;
+      }
       keywords.work(date);
     } else {
-      schoolInfo += date.workContent;
+      schoolInfo = date.workContent;
     }
   });
   if (nodes.length > 0) {
     const date = calcWorkDate(max.toDateString(), new Date().toDateString());
     const baseInfo = content.slice(0, Number(nodes[0][0]));
-    date.workContent = baseInfo + schoolInfo;
+    date.workContent = baseInfo + schoolInfo + basicInfo;
     keywords.work(date);
   }
   const score = keywords.calc(keywords.items);

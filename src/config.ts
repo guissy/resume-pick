@@ -13,30 +13,29 @@ const config = [
         "score": 1.5
       },
       {
-        "name": "h5",
+        "name": "hybrid",
         "alias": [
+          "webview",
+          "混生",
+          "hybridapp",
+          "jsbridge",
+          "apicloud",
+          "ionic",
           "uni-app",
           "uniapp",
           "umi-app",
-          "umijs",
-          "ionic",
-          "mobile",
-          "移动端",
-          "webapp"
+          "umijs"
         ],
         "score": 1.5
       },
       {
         "name": "h5",
         "alias": [
-          "webview",
-          "混生",
-          "hybrid",
-          "hybridapp",
-          "jsbridge",
-          "apicloud"
+          "mobile",
+          "移动端",
+          "webapp"
         ],
-        "score": 1.5
+        "score": 0.5
       },
       {
         "name": "react",
@@ -74,7 +73,18 @@ const config = [
       },
       {
         "name": "node",
-        "alias": ["nodejs", "express", "koa", "koa2", "egg", "next", "nextjs", "pm2", "hapi", "nuxt"],
+        "alias": [
+          "nodejs",
+          "express",
+          "koa",
+          "koa2",
+          "egg",
+          "next",
+          "nextjs",
+          "pm2",
+          "hapi",
+          "nuxt"
+        ],
         "score": 1.5
       },
       {
@@ -220,7 +230,14 @@ const config = [
       },
       {
         "name": "review",
-        "alias": ["pr", "git flow", "git-flow", "gitflow", "代码审查", "codereview"],
+        "alias": [
+          "pr",
+          "git flow",
+          "git-flow",
+          "gitflow",
+          "代码审查",
+          "codereview"
+        ],
         "score": 0.5
       },
       {
@@ -267,12 +284,32 @@ const config = [
       },
       {
         "name": "leader",
-        "alias": ["组长", "负责人", "选型", "架构设计", "框架开发", "评审", "排期", "细化", "带领", "带队"],
+        "alias": [
+          "组长",
+          "负责人",
+          "选型",
+          "架构设计",
+          "框架开发",
+          "评审",
+          "排期",
+          "细化",
+          "带领",
+          "带队"
+        ],
         "score": 2
       },
       {
         "name": "manager",
-        "alias": ["组织分享", "分配工作", "任务分配", "整体进度", "项目进度", "招聘", "多次组织", "技术分享"],
+        "alias": [
+          "组织分享",
+          "分配工作",
+          "任务分配",
+          "整体进度",
+          "项目进度",
+          "招聘",
+          "多次组织",
+          "技术分享"
+        ],
         "score": 2
       },
       {
@@ -282,7 +319,9 @@ const config = [
       },
       {
         "name": "百分点",
-        "alias": ["(减少|降低|提升|提高|降至|降到|升至|升到)(\\D{0,2})\\d+(\\.\\d+)?(%|M|s)"],
+        "alias": [
+          "(减少|降低|提升|提高|降至|降到|升至|升到)(\\D{0,2})\\d+(\\.\\d+)?(%|M|s)"
+        ],
         "score": 2
       },
       {
@@ -350,7 +389,13 @@ const config = [
       },
       {
         "name": "微服务",
-        "alias": ["monorepo", "submodule", "无服务器", "severless", "自动化构建"],
+        "alias": [
+          "monorepo",
+          "submodule",
+          "无服务器",
+          "severless",
+          "自动化构建"
+        ],
         "score": 0.5
       },
       {
@@ -412,12 +457,28 @@ const config = [
       },
       {
         "name": "性能调优",
-        "alias": ["毫秒", "攻克", "攻坚", "首屏", "懒加载", "gzip", "webp", "按需加载"],
+        "alias": [
+          "毫秒",
+          "攻克",
+          "攻坚",
+          "首屏",
+          "懒加载",
+          "gzip",
+          "webp",
+          "按需加载"
+        ],
         "score": 0.5
       },
       {
         "name": "component",
-        "alias": ["基础组件", "公共组件", "通用组件", "业务组件", "组件化", "模块化"],
+        "alias": [
+          "基础组件",
+          "公共组件",
+          "通用组件",
+          "业务组件",
+          "组件化",
+          "模块化"
+        ],
         "score": 0.5
       },
       {
@@ -447,7 +508,19 @@ const config = [
       },
       {
         "name": "java",
-        "alias": ["springcloud", "springboot", "springmvc", "mybatis", "feign", "gateway", "hystrix", "zookeeper", "dubbo", "jpa", "solr"],
+        "alias": [
+          "springcloud",
+          "springboot",
+          "springmvc",
+          "mybatis",
+          "feign",
+          "gateway",
+          "hystrix",
+          "zookeeper",
+          "dubbo",
+          "jpa",
+          "solr"
+        ],
         "score": 0.5
       },
       {
@@ -491,7 +564,16 @@ const config = [
       },
       {
         "name": "devops",
-        "alias": ["shell", "nginx", "linux", "cicd", "构建速度", "verdaccio", "私有npm", "jenkins"],
+        "alias": [
+          "shell",
+          "nginx",
+          "linux",
+          "cicd",
+          "构建速度",
+          "verdaccio",
+          "私有npm",
+          "jenkins"
+        ],
         "score": 0.5
       },
       {
