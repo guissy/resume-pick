@@ -1,6 +1,6 @@
 {
   "name": "resume-pick",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "description": "",
   "main": "main.js",
   "bin": "main.js",
@@ -17,8 +17,8 @@
     "chalk": "^4.1.0",
     "glob": "^7.1.6",
     "lodash": "^4.17.20",
-    "textract": "^2.5.0",
-    "pdf2json": "^1.2.0"
+    "pdf2json": "^1.2.0",
+    "textract": "^2.5.0"
   },
   "devDependencies": {
     "@types/jest": "^26.0.15",

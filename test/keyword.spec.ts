@@ -2,9 +2,9 @@ import { Tree, TreeItem, KeywordItem, WorkDate } from '../src/keyword';
 import config from './config';
 import dayjs from 'dayjs';
 import resume from './resume';
-import { calcTotal } from '../src/time-content';
+import { calcTotal, findSchool } from '../src/time-content';
 
-test.skip('keyword calcMonth', () => {
+test('keyword calcMonth', () => {
   const tree = new Tree([
     { name: 't', children: [] }
   ]);
@@ -69,5 +69,9 @@ test('work', () => {
     workContent: ` 美团点评 职位：WEB前端 参与日均`
   });
   expect(tree.items[0].children?.[0].score).toBeGreaterThan(2)
+});
+
+test('findSchool', () => {
+  expect(findSchool('大专 / 电气自动化1小时前来过1小时前有投递行为30天前更新简历')).toBeTruthy()
 });
 

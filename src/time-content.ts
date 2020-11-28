@@ -7,8 +7,9 @@ const cloneDeep = require('lodash/cloneDeep')
 export function findSchool(text: string) {
   // eslint-disable-next-line no-control-regex
   const regExp1 = /([^\x00-\xff]){2,6}(学院|大学|职院|师范|职中|高中|中学|一中)/;
-  const regExp2 = /(计机|计算机|电脑|电子)/;
-  return (regExp1.test(text.slice(0, 33)) || regExp2.test(text.slice(0, 33)));
+  const regExp2 = /(计机|计算机)/;
+  const regExp3 = /(博士|硕士|本科|一本|二本|大专|高中|初中)/;
+  return (regExp1.test(text.slice(0, 33)) || regExp2.test(text.slice(0, 33)) || regExp3.test(text.slice(0, 33)));
 }
 
 export function findBasic(text: string) {
