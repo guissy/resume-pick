@@ -8,7 +8,10 @@ export default function buildLevel(
   let lv = '...';
   const ageLv = Math.log2((workAge + 2) ** 1.5); // 0.492+
   const scoreLv = ((score + 2.2) ** 0.95) / 5.2; // 0.407+
-  const total = ageLv + scoreLv;
+  let total = ageLv + scoreLv;
+  if (total > 2 && workAge > 2) {
+    total += total / workAge - 2;
+  }
   if (total > 13) {
     lv = 'p8++';
   } else if (total > 12) {
@@ -29,12 +32,8 @@ export default function buildLevel(
     lv = 'p6';
   } else if (total > 4) {
     lv = 'p5+';
-  } else if (total > 3) {
-    lv = 'p5';
   } else if (total > 2) {
-    lv = 'p4+';
-  } else if (total > 1) {
-    lv = 'p4';
+    lv = 'p5';
   } else if (text.length > 0) {
     lv = '--';
   }
